@@ -51,7 +51,7 @@ def analyze(file):
 
 with gr.Blocks(title="AI投研分析工具") as demo:
 
-    gr.Markdown("# 🧠 AI投研分析工具（DeepSeek版）")
+    gr.Markdown("# 🧠 AI投研分析工具")
 
     file_input = gr.File(label="上传财报PDF")
 
