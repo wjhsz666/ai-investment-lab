@@ -42,4 +42,7 @@ with gr.Blocks(title="AI投研实验室") as demo:
 
     btn.click(fn=analyze, inputs=input_box, outputs=output)
 
-demo.launch()
+demo.launch(
+    server_name="0.0.0.0",
+    server_port=10000
+)
