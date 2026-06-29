@@ -69,17 +69,28 @@ def analyze(file):
 # UI界面升级
 with gr.Blocks(title="AI投研评分系统") as demo:
 
-    gr.Markdown("# 🧠 AI投研评分系统（升级版）")
-    gr.Markdown("上传财报PDF，自动生成公司健康评分 + 投资分析报告")
+    gr.Markdown("# 🧠 AI投研评分系统（Pro版）")
+    gr.Markdown("📊 上传财报PDF → 自动生成投资评分 + 风险分析")
 
     with gr.Row():
-        file_input = gr.File(label="上传财报PDF")
-        btn = gr.Button("🚀 开始分析")
+        file_input = gr.File(label="📎 上传财报PDF")
+        btn = gr.Button("🚀 开始分析", variant="primary")
+
+    gr.Markdown("## 📊 AI分析结果")
 
     output = gr.Textbox(
-        label="AI分析报告",
-        lines=25
+        label="投资分析报告",
+        lines=22,
+        show_copy_button=True
     )
+
+    gr.Markdown("""
+---
+### 🧠 使用说明
+- 上传年报 / 财报 PDF
+- 点击分析
+- 自动生成评分 + 投资结论
+""")
 
     btn.click(fn=analyze, inputs=file_input, outputs=output)
 
