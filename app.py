@@ -147,7 +147,9 @@ with gr.Blocks(title="AI投研评分系统") as demo:
 
     compare_btn = gr.Button("⚔️ 开始对比", variant="primary")
 
-    compare_output = gr.Textbox(lines=25)
+    compare_output = gr.Textbox(
+        label="对比分析报告",
+        lines=25)
 
     compare_btn.click(
         fn=lambda f1, f2: compare_companies(read_pdf(f1), read_pdf(f2)),
