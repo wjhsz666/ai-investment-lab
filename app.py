@@ -122,48 +122,99 @@ def compare_companies(text1, text2):
 
     return response.choices[0].message.content
 
-# UI界面升级
-with gr.Blocks(title="AI投研评分系统") as demo:
+def investment_thesis(text):
+    prompt = f"""
+你是一名顶级港美股基金经理，请基于以下财报生成投资观点报告，并严格结构化输出：
 
-    gr.Markdown("# 🧠 AI投研评分系统（Pro版）")
-    gr.Markdown("📊 上传财报PDF → 自动生成投资评分 + 风险分析")
+========================
+🧠 投资观点报告
 
-    with gr.Row():
-        file_input = gr.File(label="📎 上传财报PDF")
-        btn = gr.Button("🚀 开始分析", variant="primary")
+📌 公司定位：
+（这家公司是成长/价值/周期/防御型？）
 
-    gr.Markdown("## 📊 AI分析结果")
+📈 核心驱动因素：
+1.
+2.
+3.
 
-    output = gr.Textbox(
-        label="投资分析报告",
-        lines=22,
+⚠️ 最大风险：
+1.
+2.
 
+📊 当前估值判断：
+（低估 / 合理 / 高估，并说明理由）
+
+🏆 投资建议：
+（强烈买入 / 可配置 / 谨慎 / 回避）
+
+------------------------
+🧠 一句话总结：
+
+========================
+
+财报内容：
+{text}
+"""
+
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=[
+            {"role": "system", "content": "你是专业基金经理，输出必须像研报一样专业、克制、结构化"},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2
     )
-    gr.Markdown("## 📊 行业对比模式（Beta🔥）")
 
-    with gr.Row():
-        file1 = gr.File(label="公司A财报PDF")
-        file2 = gr.File(label="公司B财报PDF")
+    return response.choices[0].message.content
 
-    compare_btn = gr.Button("⚔️ 开始对比", variant="primary")
+# UI界面升级
+with gr.Blocks(title="AI投研决策系统 Pro") as demo:
 
+    gr.Markdown("# 🧠 AI投研决策系统 Pro")
+    gr.Markdown("📊 上传财报 → AI评分 + 对比 + 投资建议")
+
+    # =========================
+    # 单公司分析
+    # =========================
+    gr.Markdown("## 📊 单公司分析")
+
+    file_input = gr.File(label="上传财报PDF")
+    analyze_btn = gr.Button("📊 生成评分报告", variant="primary")
+    analyze_output = gr.Textbox(lines=18)
+
+    analyze_btn.click(fn=analyze, inputs=file_input, outputs=analyze_output)
+
+    # =========================
+    # 投资观点（新🔥）
+    # =========================
+    gr.Markdown("## 🧠 投资观点生成（研报级）")
+
+    thesis_btn = gr.Button("🧠 生成投资观点", variant="secondary")
+    thesis_output = gr.Textbox(lines=18)
+
+    thesis_btn.click(
+        fn=lambda f: investment_thesis(read_pdf(f)),
+        inputs=file_input,
+        outputs=thesis_output
+    )
+
+    # =========================
+    # 行业对比（已有）
+    # =========================
+    gr.Markdown("## ⚔️ 行业对比")
+
+    file1 = gr.File(label="公司A")
+    file2 = gr.File(label="公司B")
+
+    cmp_btn = gr.Button("⚔️ 开始对比", variant="primary")
     compare_output = gr.Textbox(
         label="对比分析报告",
-        lines=25)
+        lines=22)
 
-    compare_btn.click(
+    cmp_btn.click(
         fn=lambda f1, f2: compare_companies(read_pdf(f1), read_pdf(f2)),
         inputs=[file1, file2],
         outputs=compare_output
     )
-    gr.Markdown("""
----
-### 🧠 使用说明
-- 上传年报 / 财报 PDF
-- 点击分析
-- 自动生成评分 + 投资结论
-""")
-
-    btn.click(fn=analyze, inputs=file_input, outputs=output)
 
 demo.launch(server_name="0.0.0.0", server_port=10000)
