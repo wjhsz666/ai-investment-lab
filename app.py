@@ -180,7 +180,9 @@ with gr.Blocks(title="AI投研决策系统 Pro") as demo:
 
     file_input = gr.File(label="上传财报PDF")
     analyze_btn = gr.Button("📊 生成评分报告", variant="primary")
-    analyze_output = gr.Textbox(lines=18)
+    analyze_output = gr.Textbox(
+        label="评分报告",
+        lines=18)
 
     analyze_btn.click(fn=analyze, inputs=file_input, outputs=analyze_output)
 
@@ -190,7 +192,9 @@ with gr.Blocks(title="AI投研决策系统 Pro") as demo:
     gr.Markdown("## 🧠 投资观点生成（研报级）")
 
     thesis_btn = gr.Button("🧠 生成投资观点", variant="secondary")
-    thesis_output = gr.Textbox(lines=18)
+    thesis_output = gr.Textbox(
+        label="投资观点",
+        lines=18)
 
     thesis_btn.click(
         fn=lambda f: investment_thesis(read_pdf(f)),
