@@ -68,6 +68,59 @@ def analyze(file):
 
     return response.choices[0].message.content
 
+def compare_companies(text1, text2):
+    prompt = f"""
+你是一名专业港美股分析师，请对以下两家公司进行对比分析，并严格按结构输出：
+
+========================
+📊 公司A vs 公司B 对比结果
+
+📈 收入增长：
+- 公司A：
+- 公司B：
+
+💰 利润质量：
+- 公司A：
+- 公司B：
+
+💵 现金流：
+- 公司A：
+- 公司B：
+
+⚠️ 风险对比：
+- 公司A：
+- 公司B：
+
+------------------------
+🏆 综合评分：
+- 公司A：__/100
+- 公司B：__/100
+
+------------------------
+🧠 投资结论：
+只选一只更优的公司，并说明原因
+
+========================
+
+公司A财报：
+{text1}
+
+========================
+
+公司B财报：
+{text2}
+"""
+
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=[
+            {"role": "system", "content": "你是专业量化投研分析师，必须结构化输出"},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2
+    )
+
+    return response.choices[0].message.content
 
 # UI界面升级
 with gr.Blocks(title="AI投研评分系统") as demo:
@@ -84,8 +137,23 @@ with gr.Blocks(title="AI投研评分系统") as demo:
     output = gr.Textbox(
         label="投资分析报告",
         lines=22,
-           )
 
+    )
+    gr.Markdown("## 📊 行业对比模式（Beta🔥）")
+
+    with gr.Row():
+        file1 = gr.File(label="公司A财报PDF")
+        file2 = gr.File(label="公司B财报PDF")
+
+    compare_btn = gr.Button("⚔️ 开始对比", variant="primary")
+
+    compare_output = gr.Textbox(lines=25)
+
+    compare_btn.click(
+        fn=lambda f1, f2: compare_companies(read_pdf(f1), read_pdf(f2)),
+        inputs=[file1, file2],
+        outputs=compare_output
+    )
     gr.Markdown("""
 ---
 ### 🧠 使用说明
