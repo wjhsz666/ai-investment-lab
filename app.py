@@ -26,41 +26,44 @@ def analyze(file):
     text = read_pdf(file)
 
     prompt = f"""
-你是一名专业股票分析师，请对以下财报进行分析，并严格按格式输出：
+请对以下财报进行分析，并严格按以下“卡片结构”输出：
 
-【要求输出结构】
+【输出格式必须严格遵守】
 
-📊 公司健康评分（0-100）：
-- 请给出一个总分，并简要解释
+========================
+📊 公司健康评分：0-100
 
-📈 收入质量（A/B/C）：
-💰 利润质量（A/B/C）：
-💵 现金流质量（A/B/C）：
+📈 收入质量：A / B / C
+💰 利润质量：A / B / C
+💵 现金流质量：A / B / C
 
-⚠️ 风险提示（最多3条）：
+------------------------
+⚠️ 风险卡片（最多3条）：
 1.
 2.
 3.
 
-🧠 投资结论（一句话）：
+------------------------
+🧠 投资结论（1句话）：
+========================
 
 【评分规则】
-- 收入增长稳定 + 高分
-- 利润质量好 + 高分
-- 现金流健康 + 高分
-- 风险越多分越低
+- 收入增长稳定 → 高分
+- 利润质量好 → 高分
+- 现金流健康 → 高分
+- 风险越多 → 扣分
 
-【财报内容】
+财报内容如下：
 {text}
 """
 
     response = client.chat.completions.create(
         model="deepseek-chat",
         messages=[
-            {"role": "system", "content": "你是资深港美股投研分析师"},
+            {"role": "system", "content": "你是专业港美股投研分析师，输出必须结构化、适合展示"},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.3
+        temperature=0.2
     )
 
     return response.choices[0].message.content
@@ -81,8 +84,7 @@ with gr.Blocks(title="AI投研评分系统") as demo:
     output = gr.Textbox(
         label="投资分析报告",
         lines=22,
-        show_copy_button=True
-    )
+           )
 
     gr.Markdown("""
 ---
